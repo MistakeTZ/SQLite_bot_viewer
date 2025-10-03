@@ -1,7 +1,8 @@
 import abc
+from os.path import join, exists
+
 from aiogram import Bot
 from aiogram.types import Message, FSInputFile
-from os.path import join, exists
 
 
 # Загрузчик сообщений

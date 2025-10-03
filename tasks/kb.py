@@ -5,8 +5,9 @@ from aiogram.types import (
     KeyboardButton,
     ReplyKeyboardRemove,
 )
-from tasks.loader import sender, session
+
 from database.model import User
+from tasks.loader import sender, session
 
 
 # Удаление клавиатуры

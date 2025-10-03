@@ -1,13 +1,14 @@
+import logging
+
 from aiogram.filters import CommandStart
-from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
-from tasks.loader import dp, sender, session
-from database.model import User
+from aiogram.types import Message
 from sqlalchemy import exists
 
+from database.model import User
 from tasks.config import get_config
+from tasks.loader import dp, sender, session
 from tasks.states import UserState
-import logging
 
 
 @dp.message(CommandStart())

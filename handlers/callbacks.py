@@ -5,9 +5,9 @@ from aiogram.types.callback_query import CallbackQuery
 from aiogram.types import BufferedInputFile
 from aiogram.fsm.context import FSMContext
 
+from database.storage import databases
 from tasks import kb
 from tasks.loader import dp, sender, bot
-from database.storage import databases
 
 
 # Возвращение в меню

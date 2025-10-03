@@ -1,15 +1,15 @@
 import os
+from sqlite3 import connect
 
 from aiogram import F
 from aiogram.filters import Filter
-from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 
+from database.storage import databases, Database
+from tasks import kb
 from tasks.loader import dp, bot, sender
 from tasks.states import UserState
-from tasks import kb
-from sqlite3 import connect
-from database.storage import databases, Database
 
 
 class DatabaseFilter(Filter):

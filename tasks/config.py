@@ -1,9 +1,11 @@
-from aiogram.types import BotCommand
-from os import path, getenv
-import logging
-import json
 from datetime import timedelta, timezone
+import json
+import logging
+from os import path, getenv
+
+from aiogram.types import BotCommand
 from dotenv import load_dotenv
+
 
 config_file = {}
 tz: timezone

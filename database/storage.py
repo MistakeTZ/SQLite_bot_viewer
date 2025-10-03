@@ -7,7 +7,7 @@ from typing import Dict
 import logging
 
 from tabulate import tabulate
-from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 import pandas as pd
 
@@ -109,7 +109,7 @@ class Database:
 
         if not self.last_query:
             raise Exception("No last query")
-        
+
         values, header = self.get_query(self.last_query)
 
         with open(os.path.join("temp", file_path), "w", newline="") as f:

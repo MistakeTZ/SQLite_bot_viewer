@@ -1,9 +1,10 @@
-from aiogram.filters import Filter
-from tasks.loader import sender, dp, session
-from database.model import User
 from aiogram.types import Message
+from aiogram.filters import Filter
 from aiogram.fsm.context import FSMContext
 from sqlalchemy import exists
+
+from tasks.loader import sender, dp, session
+from database.model import User
 
 
 class Restricted(Filter):

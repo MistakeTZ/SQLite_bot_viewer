@@ -1,12 +1,13 @@
 import asyncio
-from tasks import kb
-from tasks.loader import bot, session
-from database.model import User, Repetition
-from sqlalchemy import select, update
-from .config import tz
 from datetime import datetime
-import handlers # noqa F401
+from sqlalchemy import select, update
+
+from database.model import User, Repetition
 from database.storage import clear_databases
+import handlers # noqa F401
+from tasks import kb
+from tasks.config import tz
+from tasks.loader import bot, session
 
 
 # Отправка запланированных сообщений

@@ -1,9 +1,9 @@
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 
-from tasks.config import get_env, load_env, load_config
-from support.messages import MessageSender, JSONMessageSender
 from database.model import init_db
+from support.messages import MessageSender, JSONMessageSender
+from tasks.config import get_env, load_env, load_config
 
 
 # Загрузка файла окружения и файла конфигурации

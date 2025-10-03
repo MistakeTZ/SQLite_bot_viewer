@@ -27,12 +27,11 @@ async def table_handler(clbck: CallbackQuery, state: FSMContext) -> None:
         return
     
     table_name = database.tables[table]
-    print(database.get_table(table_name), len(database.get_table(table_name)))
 
     await sender.edit_message(
         clbck.message,
         "table",
         kb.table(2, *database.get_buttons()),
         table_name,
-        database.get_table(table_name)
+        database.get_table(table_name)[:4000]
     )

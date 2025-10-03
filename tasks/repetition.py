@@ -30,7 +30,7 @@ async def send_messages():
                 send_msg(session, msg) for msg in messages_to_send
             ]
             await asyncio.gather(*to_send_tasks)
-        
+
         clear_databases(now)
 
         await asyncio.sleep(60)

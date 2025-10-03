@@ -1,9 +1,9 @@
 from aiogram import F
 from aiogram.types.callback_query import CallbackQuery
+from aiogram.types import BufferedInputFile
 from aiogram.fsm.context import FSMContext
-from tasks.loader import dp, sender
+from tasks.loader import dp, sender, bot
 
-from tasks.states import UserState
 from tasks import kb
 from database.storage import databases
 
@@ -11,11 +11,22 @@ from database.storage import databases
 # Возвращение в меню
 @dp.callback_query(F.data == "back")
 async def menu_handler(clbck: CallbackQuery, state: FSMContext) -> None:
-    await sender.edit_message(clbck.message, "menu")
-    await state.set_state(UserState.default)
+    user_id = clbck.from_user.id
+
+    database = databases.get(user_id)
+    if not database:
+        await clbck.answer(sender.text("no_database"))
+        return
+
+    database.last_query = None
+
+    await clbck.message.edit_text(
+        str(database),
+        reply_markup=kb.table(2, *database.get_buttons()),
+    )
 
 
-# Начинается с
+# Выбор таблицы
 @dp.callback_query(F.data.startswith("table_"))
 async def table_handler(clbck: CallbackQuery, state: FSMContext) -> None:
     user_id = clbck.from_user.id
@@ -33,5 +44,23 @@ async def table_handler(clbck: CallbackQuery, state: FSMContext) -> None:
         "table",
         kb.table(2, *database.get_buttons()),
         table_name,
-        database.get_table(table_name)[:4000]
+        database.get_table(table_name)[:4000],
     )
+
+
+# Скачивание базы данных
+@dp.callback_query(F.data.startswith("get_"))
+async def get_handler(clbck: CallbackQuery, state: FSMContext) -> None:
+    user_id = clbck.from_user.id
+    db_format = clbck.data.split("_")[-1]
+
+    database = databases.get(user_id)
+    if not database:
+        await clbck.answer(sender.text("no_database"))
+        return
+
+    if db_format == "sqlite":
+        buffer = database.get_sqlite()
+        await bot.send_document(user_id, BufferedInputFile(
+            file=buffer, filename=database.name,
+        ))

@@ -73,7 +73,7 @@ async def db_handler(msg: Message, state: FSMContext):
                 user_id,
                 "query_info",
                 kb.table(2, *database.get_buttons()),
-                database.tabulate_result(*database.get_query(text))[:4000]
+                database.tabulate_result(*database.get_query(text))[:4000],
             )
         else:
             database.execute_query(text)

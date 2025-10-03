@@ -1,5 +1,4 @@
 from datetime import datetime
-from os import path
 
 from aiogram import F
 from aiogram.filters import Filter, Command

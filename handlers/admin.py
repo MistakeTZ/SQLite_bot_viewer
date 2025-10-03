@@ -255,24 +255,3 @@ async def mailing(msg: Message, state: FSMContext):
                 session.commit()
             else:
                 await sender.message(user_id, "aborted")
-
-
-# Установка базы данных
-@dp.message(F.document, AdminFilter())
-async def set_databse(msg: Message, state: FSMContext):
-    user_id = msg.from_user.id
-    user = session.query(User).filter_by(telegram_id=user_id).one()
-    if not user:
-        return
-    if user.role != "admin":
-        return
-
-    doc = msg.document
-    if doc.file_name.split(".")[-1] != "sqlite3":
-        return
-
-    db_file = await bot.get_file(doc.file_id)
-    await bot.download_file(
-        db_file.file_path,
-        path.join("database", "db.sqlite3"),
-    )

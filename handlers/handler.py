@@ -1,23 +1,47 @@
+import os
+
 from aiogram.filters import Filter
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
-from tasks.loader import dp, sender
+from tasks.loader import dp, bot, sender
 from tasks.states import UserState
+from sqlite3 import connect
+from database.storage import databases, Database
 
 
-# Установка электронной почты
-@dp.message(UserState.email)
-async def email_check(msg: Message, state: FSMContext):
+class DatabaseFilter(Filter):
+    async def __call__(self, msg: Message, state: FSMContext):
+        if not msg.document:
+            return False
+        return msg.document.file_name.split(".")[-1] in ["sqlite3", "db"]
+
+
+@dp.message(DatabaseFilter())
+async def send_database(msg: Message, state: FSMContext):
+    document = msg.document.file_id
     user_id = msg.from_user.id
-    if not msg.entities:
-        await sender.message(user_id, "wrong_email")
+
+    try:
+        file_path = os.path.join("temp", f"tmp{document}.db")
+        await bot.download(document, file_path)
+
+        # создаём БД в памяти
+        mem_db = connect(":memory:")
+
+        src_db = connect(file_path)
+        src_db.backup(mem_db)
+        src_db.close()
+
+        # удаляем временный файл
+        os.remove(file_path)
+
+        databases[user_id] = Database(mem_db, msg.document.file_name)
+    except Exception as e:
+        sender.message(user_id, "open_error", None, str(e))
         return
-    email_entity = msg.entities[0]
-    if email_entity.type != "email":
-        await sender.message(user_id, "wrong_email")
-        return
-    email = msg.text[email_entity.offset:email_entity.length] # noqa F841
+
+    await bot.send_message(user_id, str(databases[user_id]))
 
 
 # Проверка на отсутствие состояний

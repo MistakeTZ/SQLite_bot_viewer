@@ -25,7 +25,7 @@ async def table_handler(clbck: CallbackQuery, state: FSMContext) -> None:
     if not database:
         await clbck.answer(sender.text("no_database"))
         return
-    
+
     table_name = database.tables[table]
 
     await sender.edit_message(

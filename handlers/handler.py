@@ -1,5 +1,6 @@
 import os
 
+from aiogram import F
 from aiogram.filters import Filter
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
@@ -52,15 +53,35 @@ async def send_database(msg: Message, state: FSMContext):
         reply_markup=kb.table(2, *databases[user_id].get_buttons()),
     )
 
-
-# Проверка на отсутствие состояний
-class NoStates(Filter):
-    async def __call__(self, msg: Message, state: FSMContext):
-        stat = await state.get_state()
-        return stat is None
+    await state.set_state(UserState.db)
 
 
-# Сообщение без состояний
-@dp.message(NoStates())
-async def no_states_handler(msg: Message, state: FSMContext):
-    pass
+# Обращение к базе
+@dp.message(UserState.db, F.text)
+@dp.edited_message(UserState.db)
+async def db_handler(msg: Message, state: FSMContext):
+    user_id = msg.from_user.id
+    database = databases.get(user_id)
+    if not database:
+        await sender.message(user_id, "no_database")
+        return
+
+    text = msg.text
+    try:
+        if text.lower().startswith("select"):
+            await sender.message(
+                user_id,
+                "query_info",
+                kb.table(2, *database.get_buttons()),
+                database.tabulate_result(*database.get_query(text))[:4000]
+            )
+        else:
+            database.execute_query(text)
+            await bot.send_message(
+                user_id,
+                sender.text("query_success"),
+                reply_markup=kb.table(2, *databases[user_id].get_buttons()),
+            )
+    except Exception as e:
+        await sender.message(user_id, "query_error", None, str(e))
+        return

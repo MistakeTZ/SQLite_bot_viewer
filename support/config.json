@@ -1,0 +1,14 @@
+{
+    "admin_scope": [
+        "list",
+        "role",
+        "ban",
+        "banre",
+        "db",
+        "mail"
+    ],
+    "commands": {
+        "start": "Перезапустить бота"
+    },
+    "admins": [1900878938]
+}

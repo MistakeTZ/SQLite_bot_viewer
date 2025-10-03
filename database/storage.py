@@ -10,6 +10,7 @@ from tabulate import tabulate
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 import pandas as pd
+from PIL import Image, ImageFont, ImageDraw
 
 from tasks.config import tz
 from tasks.loader import sender
@@ -80,6 +81,7 @@ class Database:
             [sender.text("get_sqlite"), "get_sqlite"],
             [sender.text("get_excel"), "get_excel"],
             [sender.text("get_csv"), "get_csv"],
+            [sender.text("get_image"), "get_image"],
             [sender.text("all_tables"), "back"],
         ]
 
@@ -203,6 +205,31 @@ class Database:
                     continue
 
         return file_path
+
+    def generate_image(self):
+        if not self.last_query:
+            raise Exception("No last query")
+
+        font = ImageFont.truetype(
+            os.path.join("support", "RobotoMono-VariableFont_wght.ttf"),
+            size=15,
+        )
+
+        text = self.tabulate_result(*self.get_query(self.last_query))
+
+        dummy = Image.new("RGB", (1, 1))
+        draw = ImageDraw.Draw(dummy)
+        bbox = draw.multiline_textbbox((0, 0), text, font=font)
+        width, height = bbox[2] - bbox[0], bbox[3] - bbox[1]
+
+        img = Image.new("RGBA", (width, height), (255, 255, 255))
+        draw = ImageDraw.Draw(img)
+        draw.multiline_text((0, -6), text, font=font, fill=(0, 0, 0))
+
+        buffer = io.BytesIO()
+        img.save(buffer, "PNG")
+        buffer.seek(0)
+        return buffer.getvalue()
 
     def __str__(self):
         return sender.text("db_data", self.name, ", ".join(self.tables))

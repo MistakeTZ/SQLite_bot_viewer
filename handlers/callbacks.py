@@ -90,5 +90,11 @@ async def get_handler(clbck: CallbackQuery, state: FSMContext) -> None:
             )
             os.remove(os.path.join("temp", file_path))
 
+        elif db_format == "image":
+            buffer = database.generate_image()
+            await bot.send_photo(user_id, BufferedInputFile(
+                file=buffer, filename=database.name + ".png",
+            ))
+
     except Exception as e:
         await sender.message(user_id, "generate_error", None, str(e))

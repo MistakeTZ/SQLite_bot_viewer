@@ -1,3 +1,4 @@
+import csv
 from datetime import datetime, timedelta
 import io
 import os
@@ -102,6 +103,21 @@ class Database:
         buffer.seek(0)
 
         return buffer.getvalue()
+
+    def get_csv(self):
+        file_path = f"{self.name}.csv"
+
+        if not self.last_query:
+            raise Exception("No last query")
+        
+        values, header = self.get_query(self.last_query)
+
+        with open(os.path.join("temp", file_path), "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            writer.writerows(values)
+
+        return file_path
 
     def get_excel(self):
         # Формируем имя файла

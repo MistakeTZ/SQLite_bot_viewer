@@ -1,10 +1,12 @@
+import os
+
 from aiogram import F
 from aiogram.types.callback_query import CallbackQuery
 from aiogram.types import BufferedInputFile
 from aiogram.fsm.context import FSMContext
-from tasks.loader import dp, sender, bot
 
 from tasks import kb
+from tasks.loader import dp, sender, bot
 from database.storage import databases
 
 
@@ -62,5 +64,16 @@ async def get_handler(clbck: CallbackQuery, state: FSMContext) -> None:
     if db_format == "sqlite":
         buffer = database.get_sqlite()
         await bot.send_document(user_id, BufferedInputFile(
-            file=buffer, filename=database.name,
+            file=buffer, filename=database.name + ".sqlite3",
         ))
+
+    elif db_format == "excel":
+        file_path = database.get_excel()
+        await sender.send_media(
+            user_id,
+            "document",
+            file_path,
+            path="temp",
+            name=database.name,
+        )
+        os.remove(os.path.join("temp", file_path))

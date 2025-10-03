@@ -38,8 +38,8 @@ async def command_settings(
     user_id = data.from_user.id
     reply = []
     for scope in get_config("admin_scope"):
-        reply.extend(["admin_" + scope] * 2)
-    reply.extend(["main_menu", "menu"])
+        reply.append(["admin_" + scope] * 2)
+    reply.append(["main_menu", "menu"])
     reply = kb.table(2, *reply, is_keys=True)
 
     if isinstance(data, Message):
@@ -92,12 +92,9 @@ async def role_handler(clbck: CallbackQuery, state: FSMContext) -> None:
     if len(data) == 2:
         await sender.edit_message(clbck.message, "choose_role", kb.table(
             2,
-            "new_admin",
-            "admin_role_admin",
-            "new_user",
-            "admin_role_user",
-            "admin",
-            "admin",
+            ["new_admin", "admin_role_admin"],
+            ["new_user", "admin_role_user"],
+            ["admin", "admin"],
             is_keys=True,
         ))
         return

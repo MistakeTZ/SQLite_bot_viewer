@@ -4,6 +4,8 @@ from aiogram.fsm.context import FSMContext
 from tasks.loader import dp, sender
 
 from tasks.states import UserState
+from tasks import kb
+from database.storage import databases
 
 
 # Возвращение в меню
@@ -14,7 +16,23 @@ async def menu_handler(clbck: CallbackQuery, state: FSMContext) -> None:
 
 
 # Начинается с
-@dp.callback_query(F.data.startswith("start_"))
-async def start_handler(clbck: CallbackQuery, state: FSMContext) -> None:
-    user_id = clbck.from_user.id # noqa F841
-    answer = clbck.data.split("_")[-1] # noqa F841
+@dp.callback_query(F.data.startswith("table_"))
+async def table_handler(clbck: CallbackQuery, state: FSMContext) -> None:
+    user_id = clbck.from_user.id
+    table = int(clbck.data.split("_")[-1])
+
+    database = databases.get(user_id)
+    if not database:
+        await clbck.answer(sender.text("no_database"))
+        return
+    
+    table_name = database.tables[table]
+    print(database.get_table(table_name), len(database.get_table(table_name)))
+
+    await sender.edit_message(
+        clbck.message,
+        "table",
+        kb.table(2, *database.get_buttons()),
+        table_name,
+        database.get_table(table_name)
+    )

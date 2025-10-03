@@ -6,6 +6,7 @@ from sqlalchemy import select, update
 from .config import tz
 from datetime import datetime
 import handlers # noqa F401
+from database.storage import clear_databases
 
 
 # Отправка запланированных сообщений
@@ -13,11 +14,13 @@ async def send_messages():
     await asyncio.sleep(5)
 
     while True:
+        now = datetime.now(tz=tz)
+
         stmt = (
             select(Repetition)
             .where(Repetition.confirmed.is_(True))
             .where(Repetition.is_send.is_(False))
-            .where(Repetition.time_to_send < datetime.now(tz=tz))
+            .where(Repetition.time_to_send < now)
         )
         result = session.execute(stmt)
         messages_to_send = result.scalars().all()
@@ -27,6 +30,8 @@ async def send_messages():
                 send_msg(session, msg) for msg in messages_to_send
             ]
             await asyncio.gather(*to_send_tasks)
+        
+        clear_databases(now)
 
         await asyncio.sleep(60)
 

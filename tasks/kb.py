@@ -63,12 +63,12 @@ def table(width: int, *args, **kwards) -> InlineKeyboardMarkup:
             in_buttons[-1].append(
                 InlineKeyboardButton(
                     text=sender.text(
-                        args[index],
-                    ) if is_keys else args[index],
-                    callback_data=args[index + 1],
+                        args[index][0],
+                    ) if is_keys else args[index][0],
+                    callback_data=args[index][1],
                 ),
             )
-            index += 2
+            index += 1
             if len(args) == index:
                 break
 

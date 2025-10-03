@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 
 from tasks.loader import dp, bot, sender
 from tasks.states import UserState
+from tasks import kb
 from sqlite3 import connect
 from database.storage import databases, Database
 
@@ -36,12 +37,20 @@ async def send_database(msg: Message, state: FSMContext):
         # удаляем временный файл
         os.remove(file_path)
 
+        previous = databases.get(user_id)
+        if previous:
+            previous.unload()
+
         databases[user_id] = Database(mem_db, msg.document.file_name)
     except Exception as e:
         sender.message(user_id, "open_error", None, str(e))
         return
 
-    await bot.send_message(user_id, str(databases[user_id]))
+    await bot.send_message(
+        user_id,
+        str(databases[user_id]),
+        reply_markup=kb.table(2, *databases[user_id].get_buttons()),
+    )
 
 
 # Проверка на отсутствие состояний
